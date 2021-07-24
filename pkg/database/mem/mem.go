@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/go-memdb"
 )
 
-func NewMemDB() (*memdb.Txn, error) {
+func NewMemDB() (*memdb.MemDB, error) {
 	scheme := &memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
 			"todo": &memdb.TableSchema{
@@ -24,6 +24,6 @@ func NewMemDB() (*memdb.Txn, error) {
 	if err != nil {
 		return nil, err
 	}
-	return db.Txn(true), nil
+	return db, nil
 
 }

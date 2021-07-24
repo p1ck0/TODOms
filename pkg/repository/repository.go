@@ -18,7 +18,7 @@ type Repo struct {
 	TODO Repoistory
 }
 
-func NewRepo(db *memdb.Txn) *Repo {
+func NewRepo(db *memdb.MemDB) *Repo {
 	return &Repo{
 		TODO: mem.NewTODOrepo(db),
 	}

@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"github.com/google/uuid"
 
 	"github.com/p1ck0/TODOms/pkg/models"
 	"github.com/p1ck0/TODOms/pkg/repository"
@@ -24,6 +25,7 @@ func NewService(rep repository.Repo, logger log.Logger) *TODOService {
 
 func (s *TODOService) Create(ctx context.Context, todo models.TODO) (string, error) {
 	logger := log.With(s.logger, "method", "Create")
+	todo.ID = uuid.New().String()
 	if err := s.repository.TODO.CreateTODO(ctx, todo); err != nil {
 		level.Error(logger).Log("err", err)
 		return "", err

@@ -31,7 +31,6 @@ func makeCreateEndpoint(s service.Serv) endpoint.Endpoint {
 
 func makeGetEndpoint(s service.Serv) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		_ = request.(GetRequest)
 		todos, err := s.TODO.Get(ctx)
 		return GetResponse{TODOs: todos, Err: err}, nil
 	}

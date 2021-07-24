@@ -43,7 +43,7 @@ func main() {
 	serv := service.NewServ(*rep, logger)
 
 	var h http.Handler
-	h = httptransport.MakeHTTPHandler(*serv, logger)
+	h = httptransport.MakeHTTPHandler(*serv, log.With(logger, "component", "HTTP"))
 
 	errs := make(chan error)
 	go func() {

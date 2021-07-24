@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -49,9 +50,11 @@ func MakeHTTPHandler(s service.Serv, logger log.Logger) http.Handler {
 
 func decodeCreateTODORequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req endpoints.CreateRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	fmt.Println(r)
+	if err := json.NewDecoder(r.Body).Decode(&req.TODO); err != nil {
 		return nil, err
 	}
+	fmt.Println(req)
 	return req, nil
 }
 

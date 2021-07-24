@@ -8,25 +8,27 @@ import (
 )
 
 type TODOrepo struct {
-	db *memdb.Txn
+	db *memdb.MemDB
 }
 
-func NewTODOrepo(db *memdb.Txn) *TODOrepo {
+func NewTODOrepo(db *memdb.MemDB) *TODOrepo {
 	return &TODOrepo{
 		db: db,
 	}
 }
 
 func (r *TODOrepo) CreateTODO(ctx context.Context, todo models.TODO) error {
-	if err := r.db.Insert("todo", todo); err != nil {
+	txn := r.db.Txn(true)
+	if err := txn.Insert("todo", todo); err != nil {
 		return err
 	}
-	r.db.Commit()
+	txn.Commit()
 	return nil
 }
 
 func (r *TODOrepo) GetTODOs(ctx context.Context) ([]models.TODO, error) {
-	it, err := r.db.Get("todo", "id")
+	txn := r.db.Txn(false)
+	it, err := txn.Get("todo", "id")
 	if err != nil {
 		return nil, err
 	}
