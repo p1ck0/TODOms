@@ -1,8 +1,6 @@
 package endpoints
 
 import (
-	"time"
-
 	"github.com/p1ck0/TODOms/pkg/models"
 )
 
@@ -23,8 +21,8 @@ type GetResponse struct {
 }
 
 type SetTimeOutRequest struct {
-	ID    string    `json:"id"`
-	Timer time.Time `json:"timer"`
+	ID     string `json:"id"`
+	Second uint64 `json:"timer"`
 }
 
 type SetTimeResponse struct {

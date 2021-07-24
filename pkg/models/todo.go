@@ -5,7 +5,7 @@ import "time"
 type TODO struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
-	Timer Timer  `json:"timer"`
+	Timer Timer  `json:"time"`
 }
 
 type Timer struct {

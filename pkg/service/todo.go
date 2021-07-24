@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -50,12 +52,36 @@ func (s *TODOService) Get(ctx context.Context) ([]models.TODO, error) {
 	return todos, nil
 }
 
-// func (s *TODOService) SetTimeOut(ctx context.Context, id string, timer time.Time) (string, error) {
-// 	logger := log.With(s.logger, "method", "Create")
-// 	if err := s.repository.TODO.SetTimeOutTODO(ctx, id, timer); err != nil {
-// 		level.Error(logger).Log("err", err)
-// 		return "", err
-// 	}
+func (s *TODOService) SetTimeOut(ctx context.Context, id string, second uint64) (string, error) {
+	logger := log.With(s.logger, "method", "Create")
+	timer := time.Now().Add(time.Second * time.Duration(second))
+	if err := s.repository.TODO.SetTimeOutTODO(ctx, id, timer); err != nil {
+		level.Error(logger).Log("err", err)
+		return "", err
+	}
 
-// 	return "ok", nil
-// }
+	go func() {
+		s.setTimer(ctx, id, timer)
+	}()
+
+	return "ok", nil
+}
+
+type TimeExp struct {
+	ID    string
+	Timer *time.Timer
+}
+
+func (s *TODOService) setTimer(ctx context.Context, id string, t time.Time) {
+	fmt.Println("timer start")
+	exp := t.Sub(time.Now())
+	timeExp := TimeExp{
+		ID:    id,
+		Timer: time.NewTimer(exp),
+	}
+	<-timeExp.Timer.C
+	fmt.Println("timer stop")
+	if err := s.repository.TODO.OffTimeOutTODO(ctx, id); err != nil {
+		fmt.Println(err)
+	}
+}

@@ -13,7 +13,7 @@ import (
 type Service interface {
 	Create(ctx context.Context, todo models.TODO) (string, error)
 	Get(ctx context.Context) ([]models.TODO, error)
-	// SetTimeOut(ctx context.Context, id string, timer time.Time) (string, error)
+	SetTimeOut(ctx context.Context, id string, second uint64) (string, error)
 }
 
 type Serv struct {

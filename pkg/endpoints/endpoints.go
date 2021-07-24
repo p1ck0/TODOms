@@ -15,9 +15,9 @@ type Endpoints struct {
 
 func MakeEndpoints(s service.Serv) Endpoints {
 	return Endpoints{
-		Create: makeCreateEndpoint(s),
-		Get:    makeGetEndpoint(s),
-		// SetTimeOut: makeSetTimeOut(s),
+		Create:     makeCreateEndpoint(s),
+		Get:        makeGetEndpoint(s),
+		SetTimeOut: makeSetTimeOut(s),
 	}
 }
 
@@ -36,10 +36,10 @@ func makeGetEndpoint(s service.Serv) endpoint.Endpoint {
 	}
 }
 
-// func makeSetTimeOut(s service.Service) endpoint.Endpoint {
-// 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-// 		req := request.(SetTimeOutRequest)
-// 		id, err := s.SetTimeOut(ctx, req.ID, req.Timer)
-// 		return SetTimeResponse{ID: id, Err: err}, nil
-// 	}
-// }
+func makeSetTimeOut(s service.Serv) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(SetTimeOutRequest)
+		id, err := s.TODO.SetTimeOut(ctx, req.ID, req.Second)
+		return SetTimeResponse{ID: id, Err: err}, nil
+	}
+}

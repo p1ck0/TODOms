@@ -2,6 +2,7 @@ package memdb
 
 import (
 	"context"
+	"time"
 
 	"github.com/hashicorp/go-memdb"
 	"github.com/p1ck0/TODOms/pkg/models"
@@ -39,5 +40,47 @@ func (r *TODOrepo) GetTODOs(ctx context.Context) ([]models.TODO, error) {
 	}
 
 	return todos, nil
+}
 
+func (r *TODOrepo) SetTimeOutTODO(ctx context.Context, id string, timer time.Time) error {
+	txn := r.db.Txn(false)
+	raw, err := txn.First("todo", "id", id)
+	if err != nil {
+		return err
+	}
+
+	todo := raw.(models.TODO)
+	todo.Timer.IsSet = true
+	todo.Timer.IsTimeOut = false
+	todo.Timer.Time = timer
+
+	txn = r.db.Txn(true)
+
+	if err := txn.Insert("todo", todo); err != nil {
+		return err
+	}
+	txn.Commit()
+
+	return nil
+}
+
+func (r *TODOrepo) OffTimeOutTODO(ctx context.Context, id string) error {
+	txn := r.db.Txn(false)
+	raw, err := txn.First("todo", "id", id)
+	if err != nil {
+		return err
+	}
+
+	todo := raw.(models.TODO)
+	todo.Timer.IsSet = false
+	todo.Timer.IsTimeOut = true
+
+	txn = r.db.Txn(true)
+
+	if err := txn.Insert("todo", todo); err != nil {
+		return err
+	}
+	txn.Commit()
+
+	return nil
 }

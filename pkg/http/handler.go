@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -39,22 +38,20 @@ func MakeHTTPHandler(s service.Serv, logger log.Logger) http.Handler {
 		options...,
 	))
 
-	// r.Methods("PUT").Path("/todo/settimeout").Handler(httptransport.NewServer(
-	// 	e.SetTimeOut,
-	// 	decodeSetTimeoutRequest,
-	// 	encodeResponse,
-	// 	options...,
-	// ))
+	r.Methods("PUT").Path("/todo/settimeout").Handler(httptransport.NewServer(
+		e.SetTimeOut,
+		decodeSetTimeOutTODORequest,
+		encodeResponse,
+		options...,
+	))
 	return r
 }
 
 func decodeCreateTODORequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req endpoints.CreateRequest
-	fmt.Println(r)
 	if err := json.NewDecoder(r.Body).Decode(&req.TODO); err != nil {
 		return nil, err
 	}
-	fmt.Println(req)
 	return req, nil
 }
 
@@ -63,13 +60,13 @@ func decodeGetTODORequest(_ context.Context, r *http.Request) (interface{}, erro
 	return req, nil
 }
 
-// func decodeSetTimeoutRequest(_ context.Context, r *http.Request) (interface{}, error) {
-// 	var req endpoints.SetTimeOutRequest
-// 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-// 		return nil, err
-// 	}
-// 	return req, nil
-// }
+func decodeSetTimeOutTODORequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req endpoints.SetTimeOutRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
 
 type errorer interface {
 	error() error
