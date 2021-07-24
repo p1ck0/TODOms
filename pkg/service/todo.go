@@ -26,12 +26,14 @@ func NewService(rep repository.Repo, logger log.Logger) *TODOService {
 func (s *TODOService) Create(ctx context.Context, todo models.TODO) (string, error) {
 	logger := log.With(s.logger, "method", "Create")
 	todo.ID = uuid.New().String()
+	todo.Timer.IsSet = false
+	todo.Timer.IsTimeOut = false
 	if err := s.repository.TODO.CreateTODO(ctx, todo); err != nil {
 		level.Error(logger).Log("err", err)
 		return "", err
 	}
 
-	return "ok", nil
+	return todo.ID, nil
 }
 
 func (s *TODOService) Get(ctx context.Context) ([]models.TODO, error) {
