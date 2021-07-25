@@ -22,17 +22,17 @@ func main() {
 	defer conn.Close()
 
 	client := pb.NewTODOServiceClient(conn)
-	// requestcreate := &pb.CreateRequest{
-	// 	TODO: &pb.TODO{
-	// 		Name: "robert",
-	// 	},
-	// }
-	requestget := &pb.GetRequest{}
+	requestcreate := &pb.CreateRequest{
+		TODO: &pb.TODO{
+			Name: "robert",
+		},
+	}
+	//requestget := &pb.GetRequest{}
 	// requestset := &pb.SetTimeOutRequest{
 	// 	ID:     "1a32bd50-c0f3-4c39-b5e1-63b17a21f963",
 	// 	Second: 30,
 	// }
-	response, err := client.Get(context.Background(), requestget)
+	response, err := client.Create(context.Background(), requestcreate)
 
 	if err != nil {
 		grpclog.Fatalf("fail to dial: %v", err)

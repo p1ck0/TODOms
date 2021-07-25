@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/go-kit/kit/log"
@@ -64,19 +65,28 @@ func main() {
 		logger.Log("during", "Listen", "err", err)
 		os.Exit(-1)
 	}
+	var wg sync.WaitGroup
 
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		level.Info(logger).Log("transport", "HTTP", "addr", *httpAddr)
 		server := &http.Server{
 			Addr:    *httpAddr,
 			Handler: h,
 		}
-		gserver := grpc.NewServer()
-		pb.RegisterTODOServiceServer(gserver, grpcServer)
-		level.Info(logger).Log("msg", "Server started successfully")
-		gserver.Serve(grpcListener)
 		errs <- server.ListenAndServe()
 	}()
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		server := grpc.NewServer()
+		pb.RegisterTODOServiceServer(server, grpcServer)
+		level.Info(logger).Log("msg", "Server started successfully")
+		server.Serve(grpcListener)
+	}()
+
+	wg.Wait()
 	level.Error(logger).Log("exit", <-errs)
 }
