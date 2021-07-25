@@ -2,6 +2,7 @@ package memdb
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/hashicorp/go-memdb"
@@ -49,7 +50,10 @@ func (r *TODOrepo) SetTimeOutTODO(ctx context.Context, id string, timer time.Tim
 		return err
 	}
 
-	todo := raw.(models.TODO)
+	todo, ok := raw.(models.TODO)
+	if !ok {
+		return errors.New("not found")
+	}
 	todo.Timer.IsSet = true
 	todo.Timer.IsTimeOut = false
 	todo.Timer.Time = timer

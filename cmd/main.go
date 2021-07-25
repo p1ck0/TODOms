@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,9 +12,13 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/p1ck0/TODOms/pkg/database/mem"
+	"github.com/p1ck0/TODOms/pkg/endpoints"
+	"github.com/p1ck0/TODOms/pkg/grpctransport"
 	httptransport "github.com/p1ck0/TODOms/pkg/http"
+	"github.com/p1ck0/TODOms/pkg/pb"
 	"github.com/p1ck0/TODOms/pkg/repository"
 	"github.com/p1ck0/TODOms/pkg/service"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -41,6 +46,8 @@ func main() {
 
 	rep := repository.NewRepo(db)
 	serv := service.NewServ(*rep, logger)
+	endpoints := endpoints.MakeEndpoints(*serv)
+	grpcServer := grpctransport.NewGRPCServer(endpoints, logger)
 
 	var h http.Handler
 	h = httptransport.MakeHTTPHandler(*serv, log.With(logger, "component", "HTTP"))
@@ -52,12 +59,22 @@ func main() {
 		errs <- fmt.Errorf("%s", <-c)
 	}()
 
+	grpcListener, err := net.Listen("tcp", ":8081")
+	if err != nil {
+		logger.Log("during", "Listen", "err", err)
+		os.Exit(-1)
+	}
+
 	go func() {
 		level.Info(logger).Log("transport", "HTTP", "addr", *httpAddr)
 		server := &http.Server{
 			Addr:    *httpAddr,
 			Handler: h,
 		}
+		gserver := grpc.NewServer()
+		pb.RegisterTODOServiceServer(gserver, grpcServer)
+		level.Info(logger).Log("msg", "Server started successfully")
+		gserver.Serve(grpcListener)
 		errs <- server.ListenAndServe()
 	}()
 

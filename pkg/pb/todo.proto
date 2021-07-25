@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+option go_package = "github.com/p1ck0/TODOms/pkg/pb";
+
+service TODOService {
+  rpc Create(CreateRequest) returns (CreateResponse) {}
+  rpc Get(GetRequest) returns (GetResponse) {}
+  rpc SetTimeOut(SetTimeOutRequest) returns (SetTimeResponse) {}
+}
+
+message CreateRequest {
+    TODO TODO = 1;
+}
+
+message CreateResponse {
+    string ID = 1;
+    string Err = 2;
+}
+
+message GetResponse {
+    repeated TODO TODOs = 1;
+    string Err = 2;
+}
+
+message SetTimeOutRequest {
+    string ID = 1;
+    uint64 Second = 2;
+}
+
+message SetTimeResponse {
+    string ID = 1;
+    string Err = 2;
+}
+
+message TODO {
+    string ID = 1;
+    string Name = 2;
+    Timer Timer = 3;
+}
+
+message Timer {
+    bool IsSet = 1;
+    bool IsTimeOut = 2;
+    string Time = 3;
+}
+
+message GetRequest {}
