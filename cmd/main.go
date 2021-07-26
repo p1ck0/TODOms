@@ -87,6 +87,7 @@ func main() {
 		server.Serve(grpcListener)
 	}()
 
-	wg.Wait()
 	level.Error(logger).Log("exit", <-errs)
+	os.Exit(-1)
+	wg.Wait()
 }
